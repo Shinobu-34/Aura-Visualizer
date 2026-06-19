@@ -86,3 +86,11 @@ Because of CORS and module restrictions with the Web Audio API, it's best to ser
 Currently, the application attempts to use the local Node.js proxy (`server.js`) to fetch streams and metadata via `yt-dlp`. However, the 'Upload Link' feature is facing reliability issues, timeouts, and occasional fetching failures when attempting to pipe the streams to the frontend Web Audio API. 
 
 If you are experienced with `yt-dlp`, Node.js streaming buffers, or Web Audio CORS handling, **pull requests and help are greatly appreciated to get the link uploading stable!**
+
+---
+
+# AuraCanvas - Immersive 3D Audio Visualizer & Music Player
+
+**[🚀 Live Demo](https://musicappspeed1.netlify.app/)**
+
+AuraCanvas is a stunning, highly dynamic 3D audio visualizer and web-based music player...
