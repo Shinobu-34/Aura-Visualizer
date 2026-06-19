@@ -1,0 +1,456 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AuraCanvas | Procedural Audio Visualizer</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Syncopate:wght@400;700&family=Inter:wght@300;400;600&family=Montserrat:wght@700;800;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <!-- Audio Element (Hidden) -->
+    <audio id="audio-source" crossorigin="anonymous"></audio>
+
+    <!-- Canvas Background -->
+    <canvas id="visualizer-canvas"></canvas>
+
+    <!-- Custom Media Background Layer -->
+    <div id="custom-media-layer" style="position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; z-index: 0; pointer-events: none; opacity: 0; transition: opacity 0.5s ease;">
+        <!-- JS will inject img or video tag here -->
+    </div>
+
+    <!-- Hero Landing Page -->
+    <div id="hero-screen" class="hero-screen landing-page-parent">
+        <div class="background-glow"></div>
+        <div class="planet-curve"></div>
+        
+        <nav class="top-nav">
+            <div class="logo">A U R A</div>
+            <div class="status">PROCEDURAL ENGINE 1.0</div>
+        </nav>
+
+        <main class="hero-content">
+            <h2 class="sub-headline">DOMINATE THE SOUND</h2>
+            <h1 class="main-headline">AURA CANVAS</h1>
+            
+            <div class="cta-container">
+                <button id="btn-launch" class="cta-button">LAUNCH VISUALIZER</button>
+            </div>
+        </main>
+
+        <!-- 3D Floating Elements -->
+        <div class="floating-container">
+            <div class="hyper-diamond-container">
+                <div class="hyper-diamond-core">
+                    <div class="diamond-plane plane-1"></div>
+                    <div class="diamond-plane plane-2"></div>
+                    <div class="diamond-plane plane-3"></div>
+                    <div class="diamond-plane plane-4"></div>
+                </div>
+            </div>
+
+            <!-- Asteroids -->
+            <div class="asteroid-wrapper" style="top: 20%; left: 80%; transform: scale(1.1);">
+                <img src="asteroid.png" class="real-asteroid" alt="Asteroid">
+                <div class="energy-ring ring-cyan"></div>
+                <div class="energy-ring ring-magenta"></div>
+            </div>
+            <div class="asteroid-wrapper" style="top: 70%; left: 10%; transform: scale(0.8);">
+                <img src="asteroid.png" class="real-asteroid" alt="Asteroid">
+                <div class="energy-ring ring-cyan"></div>
+                <div class="energy-ring ring-magenta"></div>
+            </div>
+            <div class="asteroid-wrapper" style="top: 80%; left: 85%; transform: scale(1.3);">
+                <img src="asteroid.png" class="real-asteroid" alt="Asteroid">
+                <div class="energy-ring ring-cyan"></div>
+                <div class="energy-ring ring-magenta"></div>
+            </div>
+            <div class="asteroid-wrapper" style="top: 10%; left: 30%; transform: scale(0.6);">
+                <img src="asteroid.png" class="real-asteroid" alt="Asteroid">
+                <div class="energy-ring ring-cyan"></div>
+                <div class="energy-ring ring-magenta"></div>
+            </div>
+
+        </div>
+    </div>
+
+    <!-- Top-Left Navigation (Initially Hidden) -->
+    <div id="top-nav-controls" class="top-nav-controls hidden">
+        <button id="btn-effects-toggle" class="btn-nav-pill">Effects</button>
+        <button id="btn-eq-toggle-nav" class="btn-nav-pill">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" width="16" height="16">
+                <line x1="4" y1="21" x2="4" y2="14"></line>
+                <line x1="4" y1="10" x2="4" y2="3"></line>
+                <line x1="12" y1="21" x2="12" y2="12"></line>
+                <line x1="12" y1="8" x2="12" y2="3"></line>
+                <line x1="20" y1="21" x2="20" y2="16"></line>
+                <line x1="20" y1="12" x2="20" y2="3"></line>
+                <circle cx="4" cy="12" r="2" fill="currentColor"></circle>
+                <circle cx="12" cy="10" r="2" fill="currentColor"></circle>
+                <circle cx="20" cy="14" r="2" fill="currentColor"></circle>
+            </svg>
+            Equalizer
+        </button>
+    </div>
+
+    <!-- Top-Right Navigation (Initially Hidden) -->
+    <div id="top-right-controls" class="top-right-controls hidden">
+        <button id="playlist-toggle-btn" class="btn-nav-pill" style="display: none;">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" width="16" height="16">
+                <line x1="8" y1="6" x2="21" y2="6"></line>
+                <line x1="8" y1="12" x2="21" y2="12"></line>
+                <line x1="8" y1="18" x2="21" y2="18"></line>
+                <line x1="3" y1="6" x2="3.01" y2="6"></line>
+                <line x1="3" y1="12" x2="3.01" y2="12"></line>
+                <line x1="3" y1="18" x2="3.01" y2="18"></line>
+            </svg>
+            Playlist
+        </button>
+    </div>
+
+    <div id="playlist-sidebar" class="playlist-sidebar">
+        <h3 class="panel-title" id="playlist-header">PLAYLIST [0]</h3>
+        <ul id="playlist-container" class="track-list"></ul>
+    </div>
+
+    <div id="effects-panel" class="effects-panel">
+
+        <!-- Column 1: Visual Engine -->
+        <div class="panel-section">
+            <h3 class="panel-title">Visual Engine</h3>
+            <label>Mode</label>
+            <div class="mode-list">
+                <label class="mode-item">
+                    <input type="radio" name="visual-mode" value="mandala" checked>
+                    <span>Mandala</span>
+                </label>
+                <label class="mode-item">
+                    <input type="radio" name="visual-mode" value="swarm">
+                    <span>Particle Swarm</span>
+                </label>
+                <label class="mode-item">
+                    <input type="radio" name="visual-mode" value="oscilloscope">
+                    <span>Oscilloscope Wave</span>
+                </label>
+                <label class="mode-item">
+                    <input type="radio" name="visual-mode" value="neonbars">
+                    <span>Neon Spectrum Bars</span>
+                </label>
+                <label class="mode-item">
+                    <input type="radio" name="visual-mode" value="warpdrive">
+                    <span>Warp Drive</span>
+                </label>
+                <label class="mode-item">
+                    <input type="radio" name="visual-mode" value="synthwave">
+                    <span>Synthwave Grid</span>
+                </label>
+                <label class="mode-item">
+                    <input type="radio" name="visual-mode" value="plexus">
+                    <span>Audio Plexus</span>
+                </label>
+                <label class="mode-item">
+                    <input type="radio" name="visual-mode" value="fractal">
+                    <span>Fractal Echo</span>
+                </label>
+                <label class="mode-item">
+                    <input type="radio" name="visual-mode" value="nebula">
+                    <span>Liquid Nebula</span>
+                </label>
+            </div>
+            <label for="sensitivity-slider">Sensitivity</label>
+            <input type="range" id="sensitivity-slider" class="custom-slider" min="0.5" max="2.5" step="0.1" value="1.0">
+        </div>
+
+        <!-- Column 2: Personalization -->
+        <div class="panel-section">
+            <h4 class="panel-title">PERSONALIZATION</h4>
+            
+            <!-- 1. Custom Color Override -->
+            <div class="setting-row" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
+                <label>Player Color</label>
+                <div style="display: flex; gap: 10px; align-items: center;">
+                    <input type="color" id="custom-color-picker" class="glass-input" value="#00f2fe" style="width: 40px; height: 30px; padding: 0;">
+                    <label style="font-size: 0.7rem; color: #aaa;">Override Time-Sync</label>
+                    <input type="checkbox" id="color-override-toggle" class="toggle-switch-input">
+                </div>
+            </div>
+
+            <!-- 2. Custom Background Upload -->
+            <div class="setting-row" style="display: flex; flex-direction: column; gap: 8px; margin-bottom: 15px;">
+                <label>Custom Background (Img/Video)</label>
+                <input type="file" id="custom-bg-upload" accept="image/*,video/mp4" class="btn-file-upload" style="font-size: 0.75rem;">
+            </div>
+
+            <!-- 3. Show/Hide Liquid Effects (Canvas) -->
+            <div class="setting-row" style="display: flex; justify-content: space-between; align-items: center;">
+                <label>Show Visualizer Effects</label>
+                <input type="checkbox" id="visualizer-toggle" class="toggle-switch-input" checked>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- Visualizer Control Deck (Initially Hidden) -->
+    <div id="control-deck" class="control-deck hidden">
+        <div class="track-title-container">
+            <span class="track-title-text" id="track-name">No Track Loaded</span>
+        </div>
+        
+        <div class="timeline-wrapper" style="position: relative;">
+            <span id="current-time" class="time-display">0:00</span>
+            
+            <canvas id="waveform-hover-canvas"></canvas>
+            
+            <input type="range" id="progress-bar" min="0" max="100" value="0" step="0.1">
+            <span id="total-time" class="time-display">0:00</span>
+        </div>
+
+        <div class="player-controls-container">
+            <div class="controls-left">
+                <div class="upload-buttons-wrapper">
+                    <button id="btn-upload-music" class="btn-file-upload" title="Upload Music">
+                        Upload Music
+                    </button>
+                    <button id="btn-upload-link" class="btn-file-upload" title="Upload Link">
+                        Upload Link
+                    </button>
+                </div>
+                <div class="volume-container">
+                    <button id="mute-btn" class="btn-mute" title="Mute" style="width: 36px; height: 36px;">
+                        <svg id="icon-vol-up" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="16" height="16">
+                            <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon>
+                            <path d="M19.07 4.93a10 10 0 0 1 0 14.14M15.54 8.46a5 5 0 0 1 0 7.07"></path>
+                        </svg>
+                        <svg id="icon-vol-mute" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="16" height="16" class="hidden">
+                            <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon>
+                            <line x1="23" y1="9" x2="17" y2="15"></line>
+                            <line x1="17" y1="9" x2="23" y2="15"></line>
+                        </svg>
+                    </button>
+                    <input type="range" id="volume-slider" class="volume-slider" min="0" max="1" step="0.01" value="1">
+                </div>
+            </div>
+
+            <div class="controls-center">
+                <button id="btn-prev" class="btn-icon" title="Previous Track" disabled>
+                    <svg viewBox="0 0 24 24" fill="currentColor">
+                        <polygon points="19 20 9 12 19 4 19 20"></polygon>
+                        <line x1="5" y1="19" x2="5" y2="5" stroke="currentColor" stroke-width="2" stroke-linecap="round"></line>
+                    </svg>
+                </button>
+                
+                <button id="btn-play-pause" class="btn-icon" disabled>
+                    <svg id="icon-play" viewBox="0 0 24 24" fill="currentColor">
+                        <polygon points="5 3 19 12 5 21 5 3"></polygon>
+                    </svg>
+                    <svg id="icon-pause" viewBox="0 0 24 24" fill="currentColor" class="hidden">
+                        <rect x="6" y="4" width="4" height="16"></rect>
+                        <rect x="14" y="4" width="4" height="16"></rect>
+                    </svg>
+                </button>
+
+                <button id="btn-next" class="btn-icon" title="Next Track" disabled>
+                    <svg viewBox="0 0 24 24" fill="currentColor">
+                        <polygon points="5 4 15 12 5 20 5 4"></polygon>
+                        <line x1="19" y1="5" x2="19" y2="19" stroke="currentColor" stroke-width="2" stroke-linecap="round"></line>
+                    </svg>
+                </button>
+            </div>
+
+            <div class="controls-right">
+                <button id="btn-loop-toggle" class="btn-mute" title="Toggle Loop" disabled style="width: 50px; height: 50px;">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="24" height="24">
+                        <polyline points="17 1 21 5 17 9"></polyline>
+                        <path d="M3 11V9a4 4 0 0 1 4-4h14"></path>
+                        <polyline points="7 23 3 19 7 15"></polyline>
+                        <path d="M21 13v2a4 4 0 0 1-4 4H3"></path>
+                        <text id="loop-badge-text" x="12" y="15" font-size="8" font-family="sans-serif" font-weight="bold" text-anchor="middle" fill="currentColor" stroke="none" class="hidden"></text>
+                    </svg>
+                </button>
+
+                <button id="btn-shuffle" class="btn-mute" title="Toggle Shuffle" disabled style="width: 50px; height: 50px;">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="24" height="24">
+                        <polyline points="16 3 21 3 21 8"></polyline>
+                        <line x1="4" y1="20" x2="21" y2="3"></line>
+                        <polyline points="21 16 21 21 16 21"></polyline>
+                        <line x1="15" y1="15" x2="21" y2="21"></line>
+                        <line x1="4" y1="4" x2="9" y2="9"></line>
+                    </svg>
+                </button>
+
+                <div class="speed-control-container" style="display: flex; align-items: center; gap: 10px;">
+                    <select id="playback-speed" class="glass-select" disabled>
+                        <option value="0.5">0.5x</option>
+                        <option value="0.75">0.75x</option>
+                        <option value="1" selected>1x</option>
+                        <option value="1.25">1.25x</option>
+                        <option value="1.5">1.5x</option>
+                        <option value="2">2x</option>
+                        <option value="custom">Custom...</option>
+                    </select>
+                    <input type="number" id="custom-speed-input" class="glass-input" min="0.1" max="8.0" step="0.1" placeholder="val" style="display: none;">
+                </div>
+            </div>
+        </div>
+
+        <input type="file" id="hidden-file-input" accept="audio/*" multiple style="display: none;">
+        <input type="file" id="hidden-folder-input" accept="audio/*" webkitdirectory directory multiple style="display: none;">
+    </div>
+
+    <!-- Upload Modal -->
+    <div id="upload-modal" class="upload-modal">
+        <div class="upload-modal-content">
+            <div class="upload-modal-header">
+                <h3>Select Upload Type</h3>
+                <button id="btn-close-upload-modal" class="btn-close-modal">&times;</button>
+            </div>
+            <div class="upload-modal-body">
+                <button id="btn-upload-files" class="btn-modal-option">Upload File(s)</button>
+                <button id="btn-upload-folder" class="btn-modal-option">Upload Folder</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Link Upload Modal -->
+    <div id="link-modal" class="link-modal">
+        <div class="link-modal-content">
+            <div class="link-modal-header">
+                <h3>Upload from Link</h3>
+                <button id="btn-close-link-modal" class="btn-close-modal">&times;</button>
+            </div>
+            <div class="link-modal-tabs">
+                <button id="link-tab-single" class="link-tab active" data-tab="single">Single Song</button>
+                <button id="link-tab-playlist" class="link-tab" data-tab="playlist">Playlist Link</button>
+            </div>
+            <div class="link-modal-body">
+                <div id="link-panel-single" class="link-panel active">
+                    <input type="text" id="link-input-single" class="link-input" placeholder="Paste YouTube Music, Spotify, or raw audio link here...">
+                    <button id="btn-load-song" class="btn-modal-action">Load Song</button>
+                </div>
+                <div id="link-panel-playlist" class="link-panel">
+                    <input type="text" id="link-input-playlist" class="link-input" placeholder="Paste YouTube or Spotify playlist link here...">
+                    <button id="btn-load-playlist" class="btn-modal-action">Load Playlist</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- EQ Sidebar -->
+    <div id="eq-sidebar" class="eq-sidebar">
+        <div class="eq-sidebar-header">
+            <h3 class="eq-title">Equalizer</h3>
+            <button id="btn-eq-close" class="btn-eq-close" title="Close EQ">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+                    <line x1="18" y1="6" x2="6" y2="18"></line>
+                    <line x1="6" y1="6" x2="18" y2="18"></line>
+                </svg>
+            </button>
+        </div>
+
+        <div class="eq-preset-container">
+            <select id="eq-preset" class="eq-preset-select" style="display: none;">
+                <option value="flat">Flat</option>
+                <option value="bass-boost">Bass Boost</option>
+                <option value="treble-boost">Treble Boost</option>
+                <option value="acoustic">Acoustic</option>
+                <option value="electronic">Electronic / Dance</option>
+                <option value="hip-hop">Hip-Hop</option>
+                <option value="rock">Rock</option>
+                <option value="pop">Pop</option>
+                <option value="classical">Classical</option>
+                <option value="spoken-word">Spoken Word / Podcast</option>
+                <option value="custom">Custom</option>
+            </select>
+            
+            <div class="custom-select-wrapper" id="custom-eq-dropdown">
+                <div class="custom-select-trigger" id="custom-eq-trigger">
+                    <span>Flat</span>
+                    <div class="arrow"></div>
+                </div>
+                <ul class="custom-select-options" id="custom-eq-options">
+                    <li data-value="flat" class="selected">Flat</li>
+                    <li data-value="bass-boost">Bass Boost</li>
+                    <li data-value="treble-boost">Treble Boost</li>
+                    <li data-value="acoustic">Acoustic</li>
+                    <li data-value="electronic">Electronic / Dance</li>
+                    <li data-value="hip-hop">Hip-Hop</li>
+                    <li data-value="rock">Rock</li>
+                    <li data-value="pop">Pop</li>
+                    <li data-value="classical">Classical</li>
+                    <li data-value="spoken-word">Spoken Word / Podcast</li>
+                    <li data-value="custom">Custom</li>
+                </ul>
+            </div>
+        </div>
+
+        <div class="eq-zero-line"></div>
+
+        <div class="eq-bands">
+            <div class="eq-band">
+                <span class="eq-db-label" id="eq-val-60">0 dB</span>
+                <div class="eq-slider-track">
+                    <input type="range" id="eq-60" class="eq-vertical" min="0" max="100" step="1" value="50">
+                </div>
+                <span class="eq-freq-label">60</span>
+            </div>
+            <div class="eq-band">
+                <span class="eq-db-label" id="eq-val-230">0 dB</span>
+                <div class="eq-slider-track">
+                    <input type="range" id="eq-230" class="eq-vertical" min="0" max="100" step="1" value="50">
+                </div>
+                <span class="eq-freq-label">230</span>
+            </div>
+            <div class="eq-band">
+                <span class="eq-db-label" id="eq-val-910">0 dB</span>
+                <div class="eq-slider-track">
+                    <input type="range" id="eq-910" class="eq-vertical" min="0" max="100" step="1" value="50">
+                </div>
+                <span class="eq-freq-label">910</span>
+            </div>
+            <div class="eq-band">
+                <span class="eq-db-label" id="eq-val-3600">0 dB</span>
+                <div class="eq-slider-track">
+                    <input type="range" id="eq-3600" class="eq-vertical" min="0" max="100" step="1" value="50">
+                </div>
+                <span class="eq-freq-label">3.6k</span>
+            </div>
+            <div class="eq-band">
+                <span class="eq-db-label" id="eq-val-14000">0 dB</span>
+                <div class="eq-slider-track">
+                    <input type="range" id="eq-14000" class="eq-vertical" min="0" max="100" step="1" value="50">
+                </div>
+                <span class="eq-freq-label">14k</span>
+            </div>
+        </div>
+
+        <div class="eq-db-scale">
+            <span>+12</span>
+            <span>0 dB</span>
+            <span>-12</span>
+        </div>
+    </div>
+
+    <div id="custom-upload-modal" class="upload-confirm-modal">
+        <div class="upload-modal-content">
+            <h3 id="upload-modal-title">Tracks Loaded</h3>
+            <p id="upload-modal-text">Ready to add tracks to the Visual Engine?</p>
+            <div class="upload-modal-actions">
+                <button id="btn-cancel-upload" class="btn-modal-cancel">Cancel</button>
+                <button id="btn-confirm-upload" class="btn-modal-confirm">Initialize Tracks</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Loading Popup Overlay -->
+    <div id="loading-popup" class="loading-popup-overlay">
+        <div class="loading-popup-content">
+            <div class="loading-spinner"></div>
+            <div id="loading-popup-text" class="loading-popup-text">Loading...</div>
+        </div>
+    </div>
+
+    <script src="app.js"></script>
+</body>
+</html>
