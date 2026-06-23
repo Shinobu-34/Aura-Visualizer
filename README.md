@@ -94,3 +94,6 @@ If you are experienced with `yt-dlp`, Node.js streaming buffers, or Web Audio CO
 **[🚀 Live Demo](https://musicappspeed1.netlify.app/)**
 
 AuraCanvas is a stunning, highly dynamic 3D audio visualizer and web-based music player...
+---
+
+&copy; 2026 Shinobu-34. All Rights Reserved
