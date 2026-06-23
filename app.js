@@ -412,7 +412,7 @@ async function processStreamingUrl(streamUrl, type) {
             const timeoutId = setTimeout(() => controller.abort(), 10000);
             
             try {
-                const response = await fetch('http://localhost:3001/api/playlist?url=' + encodeURIComponent(streamUrl), {
+                const response = await fetch('/api/playlist?url=' + encodeURIComponent(streamUrl), {
                     signal: controller.signal
                 });
                 clearTimeout(timeoutId);
@@ -608,7 +608,7 @@ function renderPlaylist() {
 function preloadNextTrack(nextTrackUrl) {
     console.log("Pre-loading next track in background: " + nextTrackUrl);
     // Silent fetch triggers backend yt-dlp buffer without auto-playing here
-    fetch('http://localhost:3001/api/stream?url=' + encodeURIComponent(nextTrackUrl))
+    fetch('/api/stream?url=' + encodeURIComponent(nextTrackUrl))
         .catch(err => console.log('Preload silently failed/aborted:', err));
 }
 
@@ -627,7 +627,7 @@ function loadTrack(index) {
     
     if (file.isStream) {
         // Stream from the local backend proxy
-        fileURL = `http://localhost:3001/api/stream?url=${encodeURIComponent(file.url)}`;
+        fileURL = `/api/stream?url=${encodeURIComponent(file.url)}`;
         trackNameLabel.textContent = file.name || 'YouTube Stream';
         
         // Clear hover waveform canvas since we cannot easily pre-render a remote stream

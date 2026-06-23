@@ -12,7 +12,7 @@ const fs = require('fs');
 const path = require('path');
 
 const app = express();
-const PORT = 3001;
+const PORT = process.env.PORT || 3001;
 
 const cookiesPath = path.join(__dirname, 'cookies.txt');
 const hasCookies = fs.existsSync(cookiesPath);
@@ -30,6 +30,17 @@ app.use(cors({
     methods: ['GET'],
     exposedHeaders: ['Content-Length', 'Content-Type']
 }));
+
+// Block direct access to server directory files from the frontend static serving
+app.use((req, res, next) => {
+    if (req.path.startsWith('/server')) {
+        return res.status(403).send('Access denied');
+    }
+    next();
+});
+
+// Serve frontend static files from parent directory
+app.use(express.static(path.join(__dirname, '..')));
 
 // ─────────────────── Routes ───────────────────
 
