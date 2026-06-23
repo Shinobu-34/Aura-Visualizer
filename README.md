@@ -91,7 +91,7 @@ If you are experienced with `yt-dlp`, Node.js streaming buffers, or Web Audio CO
 
 # AuraCanvas - Immersive 3D Audio Visualizer & Music Player
 
-**[🚀 Live Demo]([https://auracanvas.onrender.com/])**
+**[🚀 Live Demo](https://auracanvas.onrender.com/)**
 
 AuraCanvas is a stunning, highly dynamic 3D audio visualizer and web-based music player...
 ---
